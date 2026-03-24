@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jenkins-pipeline-lib"
+version = "1.0.0"
+description = "Reusable Jenkins pipeline template library with CLI and REST API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["jenkins", "pipeline", "ci-cd", "devops", "templates"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Build Tools",
+]
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "httpx>=0.27",          # for FastAPI TestClient
+]
+
+[project.scripts]
+jenkins-pipeline-lib = "jenkins_pipeline_lib.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["jenkins_pipeline_lib*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
