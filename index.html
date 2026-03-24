@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WellNest — Your Mindful Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sage: #8fa882;
+      --cream: #f5f0e8;
+      --warm: #e8ddd0;
+      --deep: #2d2926;
+      --muted: #7a6f66;
+      --accent: #c4a882;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--cream);
+      color: var(--deep);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      z-index: 100;
+      mix-blend-mode: multiply;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--deep);
+    }
+
+    .logo span { color: var(--sage); }
+
+    nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--deep); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 4rem 4rem 5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--sage);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 6vw, 6rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.4s ease forwards;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--sage);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 380px;
+      font-weight: 300;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s ease forwards;
+    }
+
+    .cta-group {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s ease forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--deep);
+      color: var(--cream);
+      padding: 1rem 2.2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      font-weight: 400;
+      transition: all 0.3s ease;
+      border: 1.5px solid var(--deep);
+    }
+
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--deep);
+    }
+
+    .btn-primary svg { transition: transform 0.3s; }
+    .btn-primary:hover svg { transform: translateX(4px); }
+
+    .btn-ghost {
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-bottom: 1px solid var(--warm);
+      padding-bottom: 2px;
+      transition: all 0.3s;
+    }
+
+    .btn-ghost:hover {
+      color: var(--deep);
+      border-color: var(--muted);
+    }
+
+    /* HERO RIGHT */
+    .hero-right {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .orb-container {
+      position: relative;
+      width: 500px;
+      height: 500px;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: breathe 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(143,168,130,0.35), rgba(143,168,130,0.05));
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, rgba(196,168,130,0.3), transparent);
+      top: 20%; left: 55%;
+      animation-delay: -3s;
+      animation-duration: 10s;
+    }
+
+    .orb-3 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(143,168,130,0.2), transparent);
+      bottom: 15%; left: 20%;
+      animation-delay: -6s;
+      animation-duration: 12s;
+    }
+
+    .center-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      border: 1px solid rgba(143,168,130,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spin 20s linear infinite;
+    }
+
+    .center-ring::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1px dashed rgba(143,168,130,0.15);
+      animation: spin 30s linear infinite reverse;
+    }
+
+    .center-icon {
+      font-size: 3rem;
+      animation: spin 20s linear infinite reverse;
+    }
+
+    /* FLOATING CARDS */
+    .float-card {
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 16px;
+      padding: 1rem 1.4rem;
+      font-size: 0.78rem;
+      color: var(--deep);
+      box-shadow: 0 8px 32px rgba(45,41,38,0.08);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .float-card .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--sage);
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+    }
+
+    .float-card .value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    .card-1 { top: 15%; left: 5%; animation-delay: 0s; }
+    .card-2 { bottom: 20%; right: 5%; animation-delay: -2s; }
+    .card-3 { bottom: 35%; left: 0%; animation-delay: -4s; }
+
+    /* STATS ROW */
+    .stats-row {
+      background: var(--deep);
+      color: var(--cream);
+      display: flex;
+      justify-content: center;
+      gap: 6rem;
+      padding: 3.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-row::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 60px,
+        rgba(255,255,255,0.02) 60px,
+        rgba(255,255,255,0.02) 61px
+      );
+    }
+
+    .stat {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.5);
+      margin-top: 0.4rem;
+      font-weight: 300;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 8rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .features-heading {
+      position: sticky;
+      top: 8rem;
+    }
+
+    .features-heading h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+
+    .features-heading p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .feature-item {
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--warm);
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      cursor: default;
+      transition: all 0.3s;
+    }
+
+    .feature-item:hover { padding-left: 0.5rem; }
+
+    .feature-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--sage);
+      font-style: italic;
+      padding-top: 0.2rem;
+    }
+
+    .feature-content h3 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.01em;
+    }
+
+    .feature-content p {
+      font-size: 0.87rem;
+      line-height: 1.65;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* QUOTE SECTION */
+    .quote-section {
+      background: var(--warm);
+      padding: 8rem 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-section::before {
+      content: '"';
+      position: absolute;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30rem;
+      color: rgba(143,168,130,0.08);
+      top: -6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.4;
+      position: relative;
+      z-index: 1;
+    }
+
+    cite {
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 10rem 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2rem;
+    }
+
+    .cta-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 300;
+      line-height: 1.1;
+    }
+
+    .cta-section h2 em {
+      font-style: italic;
+      color: var(--sage);
+    }
+
+    .cta-section p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 400px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--warm);
+      padding: 2rem 5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer .logo { font-size: 1.1rem; }
+
+    footer p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    .orb-2, .orb-3 {
+      animation-name: floatOrb;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(10px, -15px) scale(1.05); }
+      66% { transform: translate(-10px, 10px) scale(0.95); }
+    }
+
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 8rem 2rem 4rem; }
+      .stats-row { gap: 3rem; flex-wrap: wrap; }
+      .features { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 2rem; }
+      .features-heading { position: static; }
+      nav { padding: 1.5rem 2rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
+      .cta-section { padding: 6rem 2rem; }
+      .quote-section { padding: 5rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Well<span>Nest</span></div>
+    <a href="chat.html">Begin Session →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="eyebrow">AI-Powered Emotional Wellness</p>
+      <h1>A space to <em>breathe,<br/>reflect,</em> &amp; heal</h1>
+      <p class="subtitle">WellNest is your private, judgment-free companion for mental well-being. Share what's on your mind, anytime you need.</p>
+      <div class="cta-group">
+        <a href="chat.html" class="btn-primary">
+          Start Talking
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="#features" class="btn-ghost">How it works</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="orb-container">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="center-ring">
+          <div class="center-icon">🌿</div>
+        </div>
+        <div class="float-card card-1">
+          <div class="label">Today's Mood</div>
+          <div class="value">Calm &amp; Present</div>
+        </div>
+        <div class="float-card card-2">
+          <div class="label">Sessions</div>
+          <div class="value">12,400+</div>
+        </div>
+        <div class="float-card card-3">
+          <div class="label">Available</div>
+          <div class="value">24 / 7</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Feel Heard</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Always Available</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">No Judgment</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">🔒</div>
+      <div class="stat-label">Private & Secure</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="features-heading">
+      <h2>Designed for your mind</h2>
+      <p>Everything about WellNest is built with care — from how it listens to how it responds.</p>
+    </div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-num">01</div>
+        <div class="feature-content">
+          <h3>Empathetic Conversations</h3>
+          <p>WellNest listens without interruption and responds with warmth, reflecting back what you share and offering gentle, thoughtful perspective.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">02</div>
+        <div class="feature-content">
+          <h3>Evidence-Based Techniques</h3>
+          <p>Draws from CBT, mindfulness, and acceptance frameworks to guide you through moments of stress, anxiety, or uncertainty.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">03</div>
+        <div class="feature-content">
+          <h3>Completely Confidential</h3>
+          <p>Your conversations stay yours. WellNest does not store identifying information and your privacy is always protected.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">04</div>
+        <div class="feature-content">
+          <h3>No Appointments Needed</h3>
+          <p>Available at 3am or noon — whenever you need a moment to process, vent, or simply be heard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section">
+    <blockquote>"You don't have to be in crisis to seek support. Sometimes you just need somewhere to start."</blockquote>
+    <cite>— The WellNest Philosophy</cite>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section">
+    <h2>Ready to <em>begin?</em></h2>
+    <p>No signup required. Just open a conversation and start where you are.</p>
+    <a href="chat.html" class="btn-primary" style="font-size:0.9rem; padding: 1.1rem 2.8rem;">
+      Open WellNest
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">Well<span>Nest</span></div>
+    <p>A supplement to — never a replacement for — professional mental health care.</p>
+  </footer>
+
+</body>
+</html>
