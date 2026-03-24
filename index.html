@@ -3,665 +3,246 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WellNest — Your Mindful Companion</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <title>Jenkins Pipeline Template Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --sage: #8fa882;
-      --cream: #f5f0e8;
-      --warm: #e8ddd0;
-      --deep: #2d2926;
-      --muted: #7a6f66;
-      --accent: #c4a882;
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --border: #21262d;
+      --green: #3fb950;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Inter', sans-serif;
     }
 
-    html, body {
-      height: 100%;
-      background: var(--cream);
-      color: var(--deep);
-      font-family: 'DM Sans', sans-serif;
-      overflow-x: hidden;
-    }
-
-    /* Grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 999;
-      opacity: 0.6;
-    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
 
     /* NAV */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.5rem 3rem;
-      z-index: 100;
-      mix-blend-mode: multiply;
     }
-
-    .logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 300;
-      letter-spacing: 0.08em;
-      color: var(--deep);
-    }
-
-    .logo span { color: var(--sage); }
-
-    nav a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 400;
-      transition: color 0.3s;
-    }
-
-    nav a:hover { color: var(--deep); }
+    .logo { font-family: var(--mono); font-size: 0.85rem; color: var(--green); }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
 
     /* HERO */
     .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 8rem 4rem 4rem 5rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--sage);
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s ease forwards;
-    }
-
-    h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3.5rem, 6vw, 6rem);
-      font-weight: 300;
-      line-height: 1.05;
-      letter-spacing: -0.01em;
-      margin-bottom: 1.8rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.4s ease forwards;
-    }
-
-    h1 em {
-      font-style: italic;
-      color: var(--sage);
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 380px;
-      font-weight: 300;
-      margin-bottom: 3rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.6s ease forwards;
-    }
-
-    .cta-group {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.8s ease forwards;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: var(--deep);
-      color: var(--cream);
-      padding: 1rem 2.2rem;
-      border-radius: 50px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      letter-spacing: 0.06em;
-      font-weight: 400;
-      transition: all 0.3s ease;
-      border: 1.5px solid var(--deep);
-    }
-
-    .btn-primary:hover {
-      background: transparent;
-      color: var(--deep);
-    }
-
-    .btn-primary svg { transition: transform 0.3s; }
-    .btn-primary:hover svg { transform: translateX(4px); }
-
-    .btn-ghost {
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      border-bottom: 1px solid var(--warm);
-      padding-bottom: 2px;
-      transition: all 0.3s;
-    }
-
-    .btn-ghost:hover {
-      color: var(--deep);
-      border-color: var(--muted);
-    }
-
-    /* HERO RIGHT */
-    .hero-right {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .orb-container {
-      position: relative;
-      width: 500px;
-      height: 500px;
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: breathe 8s ease-in-out infinite;
-    }
-
-    .orb-1 {
-      width: 350px; height: 350px;
-      background: radial-gradient(circle, rgba(143,168,130,0.35), rgba(143,168,130,0.05));
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation-delay: 0s;
-    }
-
-    .orb-2 {
-      width: 250px; height: 250px;
-      background: radial-gradient(circle, rgba(196,168,130,0.3), transparent);
-      top: 20%; left: 55%;
-      animation-delay: -3s;
-      animation-duration: 10s;
-    }
-
-    .orb-3 {
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(143,168,130,0.2), transparent);
-      bottom: 15%; left: 20%;
-      animation-delay: -6s;
-      animation-duration: 12s;
-    }
-
-    .center-ring {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 180px; height: 180px;
-      border-radius: 50%;
-      border: 1px solid rgba(143,168,130,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: spin 20s linear infinite;
-    }
-
-    .center-ring::before {
-      content: '';
-      position: absolute;
-      inset: -20px;
-      border-radius: 50%;
-      border: 1px dashed rgba(143,168,130,0.15);
-      animation: spin 30s linear infinite reverse;
-    }
-
-    .center-icon {
-      font-size: 3rem;
-      animation: spin 20s linear infinite reverse;
-    }
-
-    /* FLOATING CARDS */
-    .float-card {
-      position: absolute;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-radius: 16px;
-      padding: 1rem 1.4rem;
-      font-size: 0.78rem;
-      color: var(--deep);
-      box-shadow: 0 8px 32px rgba(45,41,38,0.08);
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .float-card .label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--sage);
-      margin-bottom: 0.3rem;
-      font-weight: 500;
-    }
-
-    .float-card .value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      font-weight: 300;
-    }
-
-    .card-1 { top: 15%; left: 5%; animation-delay: 0s; }
-    .card-2 { bottom: 20%; right: 5%; animation-delay: -2s; }
-    .card-3 { bottom: 35%; left: 0%; animation-delay: -4s; }
-
-    /* STATS ROW */
-    .stats-row {
-      background: var(--deep);
-      color: var(--cream);
-      display: flex;
-      justify-content: center;
-      gap: 6rem;
-      padding: 3.5rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stats-row::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 60px,
-        rgba(255,255,255,0.02) 60px,
-        rgba(255,255,255,0.02) 61px
-      );
-    }
-
-    .stat {
-      text-align: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stat-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.5rem;
-      font-weight: 300;
-      line-height: 1;
-      color: var(--accent);
-    }
-
-    .stat-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(245,240,232,0.5);
-      margin-top: 0.4rem;
-      font-weight: 300;
-    }
-
-    /* FEATURES */
-    .features {
-      padding: 8rem 5rem;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 6rem;
-      align-items: start;
-    }
-
-    .features-heading {
-      position: sticky;
-      top: 8rem;
-    }
-
-    .features-heading h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      font-weight: 300;
-      line-height: 1.15;
-      margin-bottom: 1.2rem;
-    }
-
-    .features-heading p {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--muted);
-      font-weight: 300;
-    }
-
-    .feature-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .feature-item {
-      padding: 2.5rem 0;
-      border-top: 1px solid var(--warm);
-      display: grid;
-      grid-template-columns: 3rem 1fr;
-      gap: 1.5rem;
-      align-items: start;
-      cursor: default;
-      transition: all 0.3s;
-    }
-
-    .feature-item:hover { padding-left: 0.5rem; }
-
-    .feature-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
-      color: var(--sage);
-      font-style: italic;
-      padding-top: 0.2rem;
-    }
-
-    .feature-content h3 {
-      font-size: 1.1rem;
-      font-weight: 400;
-      margin-bottom: 0.6rem;
-      letter-spacing: 0.01em;
-    }
-
-    .feature-content p {
-      font-size: 0.87rem;
-      line-height: 1.65;
-      color: var(--muted);
-      font-weight: 300;
-    }
-
-    /* QUOTE SECTION */
-    .quote-section {
-      background: var(--warm);
-      padding: 8rem 5rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .quote-section::before {
-      content: '"';
-      position: absolute;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 30rem;
-      color: rgba(143,168,130,0.08);
-      top: -6rem;
-      left: 50%;
-      transform: translateX(-50%);
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    blockquote {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 300;
-      font-style: italic;
       max-width: 700px;
-      margin: 0 auto 2rem;
-      line-height: 1.4;
-      position: relative;
-      z-index: 1;
-    }
-
-    cite {
-      font-size: 0.78rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-style: normal;
-    }
-
-    /* CTA SECTION */
-    .cta-section {
-      padding: 10rem 5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin: 0 auto;
+      padding: 5rem 2rem 4rem;
       text-align: center;
-      gap: 2rem;
     }
+    .hero h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em; }
+    .hero p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; }
+    .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
 
-    .cta-section h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 5vw, 5rem);
-      font-weight: 300;
-      line-height: 1.1;
+    .btn {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
     }
+    .btn:hover { opacity: 0.85; }
+    .btn-green { background: var(--green); color: #000; font-weight: 700; border: none; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
 
-    .cta-section h2 em {
-      font-style: italic;
-      color: var(--sage);
-    }
-
-    .cta-section p {
-      font-size: 0.95rem;
-      color: var(--muted);
-      max-width: 400px;
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--warm);
-      padding: 2rem 5rem;
+    /* STATS */
+    .stats {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: center;
+      gap: 3rem;
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
+    .stat-num { font-family: var(--mono); font-size: 1.6rem; color: var(--green); font-weight: 700; }
+    .stat-label { font-size: 0.75rem; color: var(--muted); }
 
-    footer .logo { font-size: 1.1rem; }
+    /* SECTION */
+    .section { max-width: 900px; margin: 0 auto; padding: 3.5rem 2rem; }
+    .section + .section { border-top: 1px solid var(--border); }
+    .section-label { font-family: var(--mono); font-size: 0.7rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.75rem; }
 
-    footer p {
-      font-size: 0.75rem;
-      color: var(--muted);
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+    td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg2); }
+
+    .tid { font-family: var(--mono); font-size: 0.78rem; color: var(--green); }
+    .tcat { font-size: 0.78rem; color: var(--muted); }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 4px;
+      text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+    .s { background: rgba(63,185,80,0.12);  color: #3fb950; }
+    .m { background: rgba(210,153,34,0.15); color: #d4a017; }
+    .a { background: rgba(248,81,73,0.12);  color: #f85149; }
 
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* CODE */
+    pre {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.9;
+      overflow-x: auto;
+      color: var(--text);
     }
+    .c { color: var(--muted); }
 
-    @keyframes breathe {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-    }
+    /* METHOD BADGES */
+    .method { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; }
+    .get  { background: rgba(56,189,248,0.1); color: #38bdf8; }
+    .post { background: rgba(63,185,80,0.12); color: var(--green); }
 
-    .orb-2, .orb-3 {
-      animation-name: floatOrb;
-    }
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
 
-    @keyframes floatOrb {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(10px, -15px) scale(1.05); }
-      66% { transform: translate(-10px, 10px) scale(0.95); }
-    }
-
-    @keyframes spin {
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-12px); }
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-right { display: none; }
-      .hero-left { padding: 8rem 2rem 4rem; }
-      .stats-row { gap: 3rem; flex-wrap: wrap; }
-      .features { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 2rem; }
-      .features-heading { position: static; }
-      nav { padding: 1.5rem 2rem; }
-      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
-      .cta-section { padding: 6rem 2rem; }
-      .quote-section { padding: 5rem 2rem; }
+    @media (max-width: 600px) {
+      .stats { gap: 1.5rem; flex-wrap: wrap; }
+      .nav-links { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <div class="logo">Well<span>Nest</span></div>
-    <a href="chat.html">Begin Session →</a>
-  </nav>
+<nav>
+  <span class="logo">jenkins-pipeline-lib</span>
+  <ul class="nav-links">
+    <li><a href="#templates">Templates</a></li>
+    <li><a href="#cli">CLI</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="#install">Install</a></li>
+  </ul>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <p class="eyebrow">AI-Powered Emotional Wellness</p>
-      <h1>A space to <em>breathe,<br/>reflect,</em> &amp; heal</h1>
-      <p class="subtitle">WellNest is your private, judgment-free companion for mental well-being. Share what's on your mind, anytime you need.</p>
-      <div class="cta-group">
-        <a href="chat.html" class="btn-primary">
-          Start Talking
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-        <a href="#features" class="btn-ghost">How it works</a>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <div class="orb-container">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="center-ring">
-          <div class="center-icon">🌿</div>
-        </div>
-        <div class="float-card card-1">
-          <div class="label">Today's Mood</div>
-          <div class="value">Calm &amp; Present</div>
-        </div>
-        <div class="float-card card-2">
-          <div class="label">Sessions</div>
-          <div class="value">12,400+</div>
-        </div>
-        <div class="float-card card-3">
-          <div class="label">Available</div>
-          <div class="value">24 / 7</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-num">98%</div>
-      <div class="stat-label">Feel Heard</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">24/7</div>
-      <div class="stat-label">Always Available</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">No Judgment</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">🔒</div>
-      <div class="stat-label">Private & Secure</div>
-    </div>
+<div class="hero">
+  <h1>Jenkins Pipeline Template Library</h1>
+  <p>15 reusable Jenkins pipeline templates with a CLI tool, REST API, and intelligent recommendation engine.</p>
+  <div class="hero-actions">
+    <a class="btn btn-green" href="#install">Get Started</a>
+    <a class="btn btn-outline" href="#templates">Browse Templates</a>
   </div>
+</div>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="features-heading">
-      <h2>Designed for your mind</h2>
-      <p>Everything about WellNest is built with care — from how it listens to how it responds.</p>
-    </div>
+<div class="stats">
+  <div><div class="stat-num">15</div><div class="stat-label">Templates</div></div>
+  <div><div class="stat-num">8</div><div class="stat-label">Categories</div></div>
+  <div><div class="stat-num">8</div><div class="stat-label">API Endpoints</div></div>
+  <div><div class="stat-num">30+</div><div class="stat-label">Tests</div></div>
+</div>
 
-    <div class="feature-list">
-      <div class="feature-item">
-        <div class="feature-num">01</div>
-        <div class="feature-content">
-          <h3>Empathetic Conversations</h3>
-          <p>WellNest listens without interruption and responds with warmth, reflecting back what you share and offering gentle, thoughtful perspective.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-num">02</div>
-        <div class="feature-content">
-          <h3>Evidence-Based Techniques</h3>
-          <p>Draws from CBT, mindfulness, and acceptance frameworks to guide you through moments of stress, anxiety, or uncertainty.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-num">03</div>
-        <div class="feature-content">
-          <h3>Completely Confidential</h3>
-          <p>Your conversations stay yours. WellNest does not store identifying information and your privacy is always protected.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-num">04</div>
-        <div class="feature-content">
-          <h3>No Appointments Needed</h3>
-          <p>Available at 3am or noon — whenever you need a moment to process, vent, or simply be heard.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- TEMPLATES -->
+<div class="section" id="templates">
+  <div class="section-label">Templates</div>
+  <div class="section-title">All 15 Pipelines</div>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Category</th><th>Complexity</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="tid">python-ci</td><td>Python CI Pipeline</td><td class="tcat">CI</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">nodejs-ci</td><td>Node.js CI Pipeline</td><td class="tcat">CI</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">java-maven-ci</td><td>Java Maven CI Pipeline</td><td class="tcat">CI</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">java-gradle-ci</td><td>Java Gradle CI Pipeline</td><td class="tcat">CI</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">docker-build-push</td><td>Docker Build &amp; Push</td><td class="tcat">Docker</td><td><span class="badge s">Simple</span></td></tr>
+      <tr><td class="tid">kubernetes-deploy</td><td>Kubernetes Deployment</td><td class="tcat">Deployment</td><td><span class="badge a">Advanced</span></td></tr>
+      <tr><td class="tid">terraform-iac</td><td>Terraform Infrastructure</td><td class="tcat">Infrastructure</td><td><span class="badge a">Advanced</span></td></tr>
+      <tr><td class="tid">ansible-deploy</td><td>Ansible Deployment</td><td class="tcat">Deployment</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">microservices-ci-cd</td><td>Microservices CI/CD</td><td class="tcat">CI/CD</td><td><span class="badge a">Advanced</span></td></tr>
+      <tr><td class="tid">static-site-deploy</td><td>Static Site Deployment</td><td class="tcat">Deployment</td><td><span class="badge s">Simple</span></td></tr>
+      <tr><td class="tid">database-migration</td><td>Database Migration</td><td class="tcat">Database</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">security-scan</td><td>Security Scanning</td><td class="tcat">Security</td><td><span class="badge a">Advanced</span></td></tr>
+      <tr><td class="tid">release-management</td><td>Release Management</td><td class="tcat">Release</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">multi-branch-pipeline</td><td>Multi-Branch Pipeline</td><td class="tcat">CI</td><td><span class="badge m">Moderate</span></td></tr>
+      <tr><td class="tid">performance-test</td><td>Performance Testing</td><td class="tcat">Testing</td><td><span class="badge m">Moderate</span></td></tr>
+    </tbody>
+  </table>
+</div>
 
-  <!-- QUOTE -->
-  <section class="quote-section">
-    <blockquote>"You don't have to be in crisis to seek support. Sometimes you just need somewhere to start."</blockquote>
-    <cite>— The WellNest Philosophy</cite>
-  </section>
+<!-- CLI -->
+<div class="section" id="cli">
+  <div class="section-label">CLI</div>
+  <div class="section-title">Command Line Usage</div>
+  <pre><span class="c"># List all templates</span>
+jenkins-pipeline-lib list
 
-  <!-- FINAL CTA -->
-  <section class="cta-section">
-    <h2>Ready to <em>begin?</em></h2>
-    <p>No signup required. Just open a conversation and start where you are.</p>
-    <a href="chat.html" class="btn-primary" style="font-size:0.9rem; padding: 1.1rem 2.8rem;">
-      Open WellNest
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-  </section>
+<span class="c"># Get details on a template</span>
+jenkins-pipeline-lib info python-ci
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="logo">Well<span>Nest</span></div>
-    <p>A supplement to — never a replacement for — professional mental health care.</p>
-  </footer>
+<span class="c"># Generate files into your project</span>
+jenkins-pipeline-lib generate python-ci --output ./my-project
+
+<span class="c"># Get a recommendation</span>
+jenkins-pipeline-lib recommend -d "Python Django REST API with Docker" -t python -t docker
+
+<span class="c"># Search templates</span>
+jenkins-pipeline-lib search docker
+
+<span class="c"># List categories</span>
+jenkins-pipeline-lib categories</pre>
+</div>
+
+<!-- API -->
+<div class="section" id="api">
+  <div class="section-label">REST API</div>
+  <div class="section-title">Endpoints</div>
+  <pre><span class="c"># Start the server</span>
+uvicorn jenkins_pipeline_lib.api.app:app --reload --port 8000
+<span class="c"># Swagger UI → http://localhost:8000/docs</span></pre>
+  <br>
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/templates</td><td>List all templates</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/templates/{id}</td><td>Template details</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/templates/{id}/jenkinsfile</td><td>Raw Jenkinsfile</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/categories</td><td>All categories</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/categories/{name}/templates</td><td>Templates by category</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="tid">/recommend</td><td>Best-match template for your project</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/search?q=...</td><td>Search by keyword</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="tid">/docs</td><td>Swagger UI</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- INSTALL -->
+<div class="section" id="install">
+  <div class="section-label">Install</div>
+  <div class="section-title">Quick Start</div>
+  <pre><span class="c"># Install</span>
+pip install -e .
+
+<span class="c"># Run tests</span>
+pip install -e ".[dev]"
+pytest tests/ -v --cov=jenkins_pipeline_lib</pre>
+</div>
+
+<footer>MIT License — jenkins-pipeline-lib v1.0.0</footer>
 
 </body>
 </html>
